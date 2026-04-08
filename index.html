@@ -24,6 +24,22 @@
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 1000;
         }
 
+        .login-toggle {
+            position: absolute; right: 20px; top: 20px;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--muted); padding: 6px 10px; border-radius: 8px;
+            font-size: 10px; font-weight: 600; text-transform: uppercase; cursor: pointer;
+            transition: 0.3s;
+        }
+        .login-toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+        .pin-wrapper { width: 100%; max-width: 200px; display: none; margin-top: -5px; }
+        .pin-wrapper.show { display: block; animation: slideUp 0.3s ease-out; }
+        .pin-wrapper input {
+            text-align: center; letter-spacing: 8px; padding: 10px; font-size: 16px;
+            background: rgba(255,255,255,0.05); border-color: var(--border); transition: border-color 0.3s;
+        }
+
         .logo { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
         .logo span:first-child { font-family: 'Playfair Display', serif; font-size: 20px; background: var(--gold-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
         .logo span:last-child { font-size: 8px; color: var(--text); letter-spacing: 4px; opacity: 0.7; text-transform: uppercase; }
@@ -56,12 +72,16 @@
 
         .list-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .checkbox { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 6px; flex-shrink: 0; position: relative; margin-top: 2px; }
+        
+        /* Галочка кликабельна только при наличии прав (класс active-check будет добавлен скриптом) */
+        .active-check { cursor: pointer; } 
+        
         .list-item.done .checkbox { background: var(--accent); border-color: var(--accent); }
         .list-item.done .checkbox::after { content: '✓'; position: absolute; color: #000; left: 4px; top: -2px; font-weight: 900; font-size: 14px; }
         .list-item.done span.list-text { color: var(--muted); text-decoration: line-through; }
         .list-text { font-size: 13px; font-weight: 400; flex-grow: 1; line-height: 1.4; }
 
-        .del-icon { color: var(--muted); opacity: 0.5; padding: 5px; font-size: 16px; margin-right: -5px; }
+        .del-icon { color: var(--muted); opacity: 0.5; padding: 5px; font-size: 16px; margin-right: -5px; cursor: pointer; }
         .del-icon:active { opacity: 1; color: var(--accent); }
 
         .finance-summary { display: flex; justify-content: space-between; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
@@ -70,13 +90,22 @@
         .f-val { font-size: 16px; font-weight: 600; color: #fff; }
 
         footer { text-align: center; padding: 30px; font-size: 10px; color: var(--muted); letter-spacing: 0.5px; }
+
+        /* Утилита для скрытия */
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
 <header>
+    <button id="loginBtn" class="login-toggle">Войти 🔒</button>
     <a href="#" class="logo"><span>BV</span><span>JEWELRY</span></a>
     <div class="client-greeting">Проект Владимира • Разработчик Евгений</div>
+    
+    <div id="pinWrapper" class="pin-wrapper">
+        <input type="password" id="pinInput" maxlength="4" placeholder="••••">
+    </div>
+
     <nav class="tabs-nav">
         <button class="tab-btn active" onclick="switchTab('tasks', this)">Прогресс</button>
         <button class="tab-btn" onclick="switchTab('budget', this)">Оплаты</button>
@@ -94,7 +123,7 @@
         
         <div class="card">
             <b style="font-size: 13px; display: block; margin-bottom: 15px; text-transform: uppercase; color: var(--accent);">Дизайн и Интерфейс</b>
-            <div class="input-group">
+            <div id="addTaskFEBlock" class="input-group hidden">
                 <input type="text" id="feInput" placeholder="Название новой задачи...">
                 <button onclick="addTask('fe')" class="btn-action btn-task">Добавить задачу</button>
             </div>
@@ -103,7 +132,7 @@
 
         <div class="card">
             <b style="font-size: 13px; display: block; margin-bottom: 15px; text-transform: uppercase; color: var(--accent);">Логика, Маркетинг и Запуск</b>
-            <div class="input-group">
+            <div id="addTaskBEBlock" class="input-group hidden">
                 <input type="text" id="beInput" placeholder="Название новой задачи...">
                 <button onclick="addTask('be')" class="btn-action btn-task">Добавить задачу</button>
             </div>
@@ -126,8 +155,8 @@
                 </div>
             </div>
             
-            <b style="font-size: 11px; display: block; margin: 25px 0 15px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Добавить запись</b>
-            <div class="input-group">
+            <b id="addMoneyTitle" class="hidden" style="font-size: 11px; display: block; margin: 25px 0 15px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Добавить запись</b>
+            <div id="addMoneyBlock" class="input-group hidden">
                 <input type="number" id="moneyVal" placeholder="Сумма (грн)">
                 <input type="text" id="moneyNote" placeholder="Назначение (например: Оплата)">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
@@ -149,7 +178,10 @@
 <script>
     const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxBwebL5EnRNPDdhyjgpAATUFUtOWKnEH1O4CBoWR2gcLhe3LkYYgwnG8s9di6qAvUYtA/exec';
     
-    // Исходные данные на основе твоего списка
+    // УРОВНИ ДОСТУПА
+    // 0: Зритель, 1: Админ (0011), 2: Супер-Админ (0001)
+    let adminLevel = 0;
+
     let state = {
         transactions: [
             { type: 'income', uah: 4000, note: 'Оплата за работу', date: '08.04.2026' },
@@ -186,6 +218,58 @@
         ]
     };
 
+    // ЛОГИКА АВТОРИЗАЦИИ
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginBtn = document.getElementById('loginBtn');
+        const pinWrapper = document.getElementById('pinWrapper');
+        const pinInput = document.getElementById('pinInput');
+
+        // Кнопка Вход / Выход
+        loginBtn.addEventListener('click', () => {
+            if (adminLevel > 0) {
+                // Если был авторизован — ВЫХОДИМ
+                adminLevel = 0;
+                loginBtn.innerHTML = 'Войти 🔒';
+                loginBtn.style.color = '';
+                loginBtn.style.borderColor = '';
+                render(); // Перерисовываем интерфейс для зрителя
+            } else {
+                // Если не авторизован — открываем/закрываем поле ввода
+                pinWrapper.classList.toggle('show');
+                if (pinWrapper.classList.contains('show')) {
+                    pinInput.focus();
+                } else {
+                    pinInput.value = ''; 
+                }
+            }
+        });
+
+        // Проверка ПИН-кода при вводе
+        pinInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+
+            if (val === '0011' || val === '0001') {
+                // Устанавливаем уровень (0001 -> 2, 0011 -> 1)
+                adminLevel = (val === '0001') ? 2 : 1;
+                
+                // Меняем кнопку в шапке
+                loginBtn.innerHTML = adminLevel === 2 ? 'Супер Админ 👑' : 'Админ 🔓';
+                loginBtn.style.color = 'var(--accent)';
+                loginBtn.style.borderColor = 'var(--accent)';
+                
+                // Закрываем панель с паролем и очищаем её
+                pinWrapper.classList.remove('show');
+                pinInput.value = '';
+                
+                render(); // Перерисовываем с новыми правами
+            } else if (val.length === 4) {
+                // Введен неправильный пароль (4 цифры) - мигаем красным
+                pinInput.style.borderColor = '#ff4d4d';
+                setTimeout(() => { pinInput.style.borderColor = 'var(--border)'; }, 500);
+            }
+        });
+    });
+
     async function sync(data = null) {
         document.querySelectorAll('.sync-status').forEach(el => el.innerText = 'Сохранение...');
         try {
@@ -204,6 +288,25 @@
     }
 
     function render() {
+        // Логика показа/скрытия блоков в зависимости от прав
+        const toggleVis = (id, condition) => {
+            const el = document.getElementById(id);
+            if (el) condition ? el.classList.remove('hidden') : el.classList.add('hidden');
+        };
+
+        // Блоки добавления ЗАДАЧ видны только Супер-Админу (0001)
+        toggleVis('addTaskFEBlock', adminLevel >= 2);
+        toggleVis('addTaskBEBlock', adminLevel >= 2);
+        
+        // Блок добавления ТРАНЗАКЦИЙ виден и Админу (0011) и Супер-Админу
+        toggleVis('addMoneyTitle', adminLevel >= 1);
+        toggleVis('addMoneyBlock', adminLevel >= 1);
+
+        // Класс для скрытия крестиков
+        const hideDelClass = adminLevel >= 1 ? '' : 'hidden';
+        // Класс для мышки при наведении на галочки
+        const checkCursor = adminLevel >= 1 ? 'active-check' : '';
+
         const draw = (list, id, type) => {
             const cont = document.getElementById(id); cont.innerHTML = '';
             let d = 0;
@@ -211,13 +314,14 @@
                 if(t.done) d++;
                 cont.innerHTML += `
                 <div class="list-item ${t.done?'done':''}">
-                    <div class="checkbox" onclick="toggleT('${type}',${i})"></div>
-                    <span class="list-text" onclick="toggleT('${type}',${i})">${t.text}</span>
-                    <div class="del-icon" onclick="delT('${type}',${i})">✕</div>
+                    <div class="checkbox ${checkCursor}" onclick="toggleT('${type}',${i})"></div>
+                    <span class="list-text ${checkCursor}" onclick="toggleT('${type}',${i})">${t.text}</span>
+                    <div class="del-icon ${hideDelClass}" onclick="delT('${type}',${i})">✕</div>
                 </div>`;
             });
             return d;
         };
+        
         const fD = draw(state.feTasks, 'feList', 'fe');
         const bD = draw(state.beTasks, 'beList', 'be');
         const p = Math.round(((fD+bD)/(state.feTasks.length+state.beTasks.length))*100);
@@ -232,7 +336,7 @@
             <div class="list-item" style="align-items: center;">
                 <div class="list-text"><b>${t.note}</b><br><small style="color:var(--muted)">${t.date}</small></div>
                 <b style="color: ${t.type==='income' ? '#fff' : 'var(--muted)'}; font-size: 14px;">${t.type==='income'?'+':'-'}${t.uah} ₴</b>
-                <div class="del-icon" onclick="delM(${i})">✕</div>
+                <div class="del-icon ${hideDelClass}" onclick="delM(${i})">✕</div>
             </div>`;
         });
         document.getElementById('totalIncome').innerText = `${inc} ₴`;
@@ -245,23 +349,41 @@
         document.getElementById(t+'View').classList.add('active'); b.classList.add('active');
     };
 
+    // ФУНКЦИИ (защищены проверкой adminLevel)
+    
+    // Добавление задач требует уровня 2 (0001)
     window.addTask = (type) => {
+        if (adminLevel < 2) return; 
         const inp = document.getElementById(type+'Input');
         if(!inp.value) return;
         state[type+'Tasks'].push({text: inp.value, done: false});
         inp.value = ''; sync(state);
     };
 
-    window.toggleT = (type, i) => { state[type+'Tasks'][i].done = !state[type+'Tasks'][i].done; sync(state); };
-    window.delT = (type, i) => { if(confirm('Удалить задачу?')){state[type+'Tasks'].splice(i,1); sync(state);} };
+    // Остальное требует минимум 1 (0011 или 0001)
+    window.toggleT = (type, i) => { 
+        if (adminLevel < 1) return;
+        state[type+'Tasks'][i].done = !state[type+'Tasks'][i].done; 
+        sync(state); 
+    };
+    
+    window.delT = (type, i) => { 
+        if (adminLevel < 1) return;
+        if(confirm('Удалить задачу?')){state[type+'Tasks'].splice(i,1); sync(state);} 
+    };
 
     window.addMoney = (type) => {
+        if (adminLevel < 1) return;
         const v = document.getElementById('moneyVal'); const n = document.getElementById('moneyNote');
         if(!v.value) return;
         state.transactions.unshift({type, uah: parseFloat(v.value), note: n.value||(type==='income'?'Оплата':'Расход'), date: new Date().toLocaleDateString()});
         v.value = ''; n.value = ''; sync(state);
     };
-    window.delM = (i) => { if(confirm('Удалить запись?')){state.transactions.splice(i,1); sync(state);} };
+    
+    window.delM = (i) => { 
+        if (adminLevel < 1) return;
+        if(confirm('Удалить запись?')){state.transactions.splice(i,1); sync(state);} 
+    };
 
     sync();
 </script>
