@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BV Jewelry | Mobile Manager</title>
+    <title>BV Jewelry | Рабочая панель</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #000000; --card: #151517; --accent: #d4af37; --text: #ffffff; --muted: #8e8e93;
             --border: rgba(255, 255, 255, 0.08); --gold-grad: linear-gradient(135deg, #fbf2c6 0%, #d4af37 35%, #b68d40 60%, #fbf2c6 100%);
-            --danger: #ff453a; --success: #32d74b;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -19,16 +18,17 @@
             margin: 0; padding: 0; -webkit-font-smoothing: antialiased; line-height: 1.5;
         }
 
-        /* HEADER & TABS */
         header {
-            padding: 15px 20px; display: flex; flex-direction: column; align-items: center; gap: 15px;
+            padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px;
             border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(0,0,0,0.85); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 1000;
         }
 
         .logo { display: flex; flex-direction: column; align-items: center; text-decoration: none; }
         .logo span:first-child { font-family: 'Playfair Display', serif; font-size: 20px; background: var(--gold-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
-        .logo span:last-child { font-size: 6px; color: var(--text); letter-spacing: 4px; opacity: 0.7; text-transform: uppercase; }
+        .logo span:last-child { font-size: 8px; color: var(--text); letter-spacing: 4px; opacity: 0.7; text-transform: uppercase; }
+        
+        .client-greeting { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; margin-top: -5px; }
 
         .tabs-nav { width: 100%; display: flex; gap: 5px; background: #000; padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
         .tab-btn { flex: 1; padding: 10px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; color: var(--muted); background: transparent; text-transform: uppercase; transition: 0.2s; }
@@ -38,148 +38,156 @@
 
         .view { display: none; animation: slideUp 0.3s ease-out; }
         .view.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* CARDS */
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 20px; position: relative; }
-        .sync-status { position: absolute; top: 15px; right: 20px; font-size: 8px; text-transform: uppercase; color: var(--muted); font-weight: 800; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; position: relative; }
+        .sync-status { position: absolute; top: 15px; right: 20px; font-size: 9px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
         
-        .balance-val { font-size: 42px; font-weight: 700; background: var(--gold-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0; letter-spacing: -1px; }
-        .rate-badge { font-size: 10px; color: var(--success); background: rgba(50, 215, 75, 0.1); padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px; }
+        .progress-container { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--gold-grad); width: 0%; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        .progress-container { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 15px 0; overflow: hidden; border: 1px solid var(--border); }
-        .progress-fill { height: 100%; background: var(--gold-grad); width: 0%; transition: 1.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); }
-
-        /* INPUTS & BUTTONS */
         .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-        input { 
-            background: #000; border: 1px solid var(--border); border-radius: 14px; padding: 14px; 
-            color: #fff; font-size: 15px; width: 100%; outline: none; transition: 0.3s;
-        }
+        input { background: #000; border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: #fff; font-size: 14px; width: 100%; outline: none; }
         input:focus { border-color: var(--accent); }
         
-        .btn-action { 
-            padding: 15px; border-radius: 14px; font-weight: 800; font-size: 13px; text-transform: uppercase; 
-            cursor: pointer; border: none; width: 100%; transition: 0.2s; letter-spacing: 1px;
-        }
-        .btn-income { background: var(--success); color: #000; }
-        .btn-expense { background: var(--danger); color: #fff; }
-        .btn-task { background: var(--accent); color: #000; margin-top: 5px; }
+        .btn-action { padding: 14px; border-radius: 12px; font-weight: 600; font-size: 12px; text-transform: uppercase; cursor: pointer; border: none; width: 100%; letter-spacing: 1px; }
+        .btn-task { background: var(--border); color: #fff; margin-top: 5px; }
+        .btn-task:active { background: var(--accent); color: #000; }
 
-        /* LIST ITEMS */
-        .list-item { display: flex; align-items: center; gap: 12px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .checkbox { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 7px; flex-shrink: 0; position: relative; }
+        .list-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .checkbox { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 6px; flex-shrink: 0; position: relative; margin-top: 2px; }
         .list-item.done .checkbox { background: var(--accent); border-color: var(--accent); }
-        .list-item.done .checkbox::after { content: '✓'; position: absolute; color: #000; left: 4px; top: -1px; font-weight: 900; font-size: 15px; }
-        .list-item.done span { color: var(--muted); text-decoration: line-through; }
-        .list-text { font-size: 14px; font-weight: 500; flex-grow: 1; }
+        .list-item.done .checkbox::after { content: '✓'; position: absolute; color: #000; left: 4px; top: -2px; font-weight: 900; font-size: 14px; }
+        .list-item.done span.list-text { color: var(--muted); text-decoration: line-through; }
+        .list-text { font-size: 13px; font-weight: 400; flex-grow: 1; line-height: 1.4; }
 
-        .del-icon { color: var(--danger); opacity: 0.4; padding: 10px; font-size: 18px; margin-right: -10px; }
+        .del-icon { color: var(--muted); opacity: 0.5; padding: 5px; font-size: 16px; margin-right: -5px; }
+        .del-icon:active { opacity: 1; color: var(--accent); }
 
-        footer { text-align: center; padding: 30px; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+        .finance-summary { display: flex; justify-content: space-between; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .f-block { display: flex; flex-direction: column; gap: 5px; }
+        .f-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+        .f-val { font-size: 16px; font-weight: 600; color: #fff; }
+
+        footer { text-align: center; padding: 30px; font-size: 10px; color: var(--muted); letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
 <header>
     <a href="#" class="logo"><span>BV</span><span>JEWELRY</span></a>
+    <div class="client-greeting">Проект Владимира • Разработчик Евгений</div>
     <nav class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab('tasks', this)">📂 Прогрес</button>
-        <button class="tab-btn" onclick="switchTab('budget', this)">💰 Бюджет ($)</button>
+        <button class="tab-btn active" onclick="switchTab('tasks', this)">Прогресс</button>
+        <button class="tab-btn" onclick="switchTab('budget', this)">Оплаты</button>
     </nav>
 </header>
 
 <main>
     <div id="tasksView" class="view active">
-        <div class="card" style="text-align: center">
-            <span class="sync-status">Cloud Sync</span>
-            <span style="font-size: 10px; color: var(--muted); letter-spacing: 1px">ПРОГРЕС РОБОТИ</span>
-            <div id="overallPerc" style="font-size: 48px; font-weight: 800; margin: 10px 0">0%</div>
+        <div class="card" style="text-align: center; padding: 30px 20px;">
+            <span class="sync-status">Синхронизация</span>
+            <span style="font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px">Готовность проекта</span>
+            <div id="overallPerc" style="font-size: 48px; font-weight: 700; margin: 10px 0; background: var(--gold-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">0%</div>
             <div class="progress-container"><div class="progress-fill" id="progBar"></div></div>
         </div>
         
         <div class="card">
-            <b style="font-size: 13px; display: block; margin-bottom: 15px">🎨 FRONT-END</b>
+            <b style="font-size: 13px; display: block; margin-bottom: 15px; text-transform: uppercase; color: var(--accent);">Дизайн и Интерфейс</b>
             <div class="input-group">
-                <input type="text" id="feInput" placeholder="Додати етап...">
-                <button onclick="addTask('fe')" class="btn-action btn-task">Додати +</button>
+                <input type="text" id="feInput" placeholder="Название новой задачи...">
+                <button onclick="addTask('fe')" class="btn-action btn-task">Добавить задачу</button>
             </div>
             <div id="feList"></div>
         </div>
 
         <div class="card">
-            <b style="font-size: 13px; display: block; margin-bottom: 15px">⚙️ BACK-END</b>
+            <b style="font-size: 13px; display: block; margin-bottom: 15px; text-transform: uppercase; color: var(--accent);">Логика, Маркетинг и Запуск</b>
             <div class="input-group">
-                <input type="text" id="beInput" placeholder="Додати етап...">
-                <button onclick="addTask('be')" class="btn-action btn-task">Додати +</button>
+                <input type="text" id="beInput" placeholder="Название новой задачи...">
+                <button onclick="addTask('be')" class="btn-action btn-task">Добавить задачу</button>
             </div>
             <div id="beList"></div>
         </div>
     </div>
 
     <div id="budgetView" class="view">
-        <div class="card" style="text-align: center">
-            <span class="sync-status">Cloud Sync</span>
-            <span style="font-size: 10px; color: var(--muted); letter-spacing: 1px">БАЛАНС В USD</span>
-            <div class="balance-val" id="currentBalance">$0.00</div>
-            <div id="rateVal" class="rate-badge">Оновлення...</div>
-            <div class="progress-container"><div class="progress-fill" id="moneyBar"></div></div>
-            <div id="moneyPerc" style="font-size: 12px; font-weight: 700; color: var(--accent)">0% від $1500</div>
-        </div>
-
         <div class="card">
-            <b style="font-size: 13px; display: block; margin-bottom: 15px">➕ ДОДАТИ ТРАНЗАКЦІЮ (UAH)</b>
+            <span class="sync-status">Синхронизация</span>
+            <b style="font-size: 13px; display: block; margin-bottom: 15px; text-transform: uppercase;">Сводка по проекту</b>
+            <div class="finance-summary">
+                <div class="f-block">
+                    <span class="f-label">Поступило оплат</span>
+                    <span class="f-val" id="totalIncome">0 грн</span>
+                </div>
+                <div class="f-block" style="text-align: right;">
+                    <span class="f-label">Затраты на сервисы</span>
+                    <span class="f-val" id="totalExpense">0 грн</span>
+                </div>
+            </div>
+            
+            <b style="font-size: 11px; display: block; margin: 25px 0 15px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Добавить запись</b>
             <div class="input-group">
-                <input type="number" id="moneyVal" placeholder="Сума (грн)">
-                <input type="text" id="moneyNote" placeholder="Коментар">
+                <input type="number" id="moneyVal" placeholder="Сумма (грн)">
+                <input type="text" id="moneyNote" placeholder="Назначение (например: Оплата)">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
-                    <button onclick="addMoney('income')" class="btn-action btn-income">Прихід</button>
-                    <button onclick="addMoney('expense')" class="btn-action btn-expense">Витрата</button>
+                    <button onclick="addMoney('income')" class="btn-action" style="background: rgba(255,255,255,0.1); color: #fff;">Поступление +</button>
+                    <button onclick="addMoney('expense')" class="btn-action" style="background: rgba(255,255,255,0.05); color: var(--muted);">Расход (домен/сервер) -</button>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <b style="font-size: 12px; margin-bottom: 15px; display: block">ОСТАННІ ОПЛАТИ (UAH)</b>
+            <b style="font-size: 13px; margin-bottom: 15px; display: block; text-transform: uppercase;">Журнал транзакций</b>
             <div id="histContent"></div>
         </div>
     </div>
 </main>
 
-<footer>BV Jewelry Manager v4.3 Cloud</footer>
+<footer>Панель управления проектом BV Jewelry</footer>
 
 <script>
     const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxBwebL5EnRNPDdhyjgpAATUFUtOWKnEH1O4CBoWR2gcLhe3LkYYgwnG8s9di6qAvUYtA/exec';
     
-    let usdRate = 39.8;
+    // Исходные данные на основе твоего списка
     let state = {
-        goal: 1500,
         transactions: [
-            { type: 'income', uah: 2000, note: 'Оплата за роботу (мені)', date: '08.04.2026' },
-            { type: 'expense', uah: 890, note: 'Витрата на домен', date: '08.04.2026' },
-            { type: 'income', uah: 3300, note: 'Аванс (початковий платіж)', date: '08.04.2026' }
+            { type: 'income', uah: 4000, note: 'Оплата за работу', date: '08.04.2026' },
+            { type: 'income', uah: 2000, note: 'Оплата за работу', date: '03.04.2026' },
+            { type: 'expense', uah: 893, note: 'Оплата домена на NIC.ua', date: '01.04.2026' },
+            { type: 'income', uah: 3300, note: 'Аванс от Владимира', date: '01.04.2026' }
         ],
         feTasks: [
-            { text: 'Дизайн OLED Luxury Style', done: true },
-            { text: 'Мобільна адаптація (iPhone/Android)', done: true },
-            { text: 'Каталог та Картки товарів (UI)', done: true },
-            { text: 'Логіка та інтерфейс Кошика', done: true },
-            { text: 'Панель Адміністратора (UI)', done: true },
-            { text: 'Міні-месенджер для менеджера', done: false },
-            { text: 'Анкета для ексклюзивів', done: false }
+            { text: 'Базовая структура интернет-магазина', done: true },
+            { text: 'Каталог товаров с корректным отображением', done: true },
+            { text: 'Карточки товаров (фото, название, цена)', done: true },
+            { text: 'Основной UI-дизайн в фирменной стилистике', done: true },
+            { text: 'Базовая адаптация под мобильные устройства', done: true },
+            { text: 'Первичная оптимизация производительности', done: true },
+            { text: 'Установка светлой темы по умолчанию', done: false },
+            { text: 'Новостной/акционный баннер на главной', done: false },
+            { text: 'Симметричные карточки главного блока', done: false },
+            { text: 'Золотистый цвет заголовка BV Jewelry', done: false },
+            { text: 'Плавная оптимизированная анимация', done: false },
+            { text: 'Финальная доработка UI/UX', done: false },
+            { text: 'Интерактивные элементы (кнопки, hover)', done: false },
+            { text: 'Страницы: контакты, политика/условия', done: false }
         ],
         beTasks: [
-            { text: 'Логіка LocalStorage та демо-дані', done: true },
-            { text: 'Авторизація Адміна (admin/admin)', done: true },
-            { text: 'Реальне додавання товарів (Firebase)', done: false },
-            { text: 'Реєстрація та вхід клієнтів', done: false },
-            { text: 'Збереження історії покупок', done: false },
-            { text: 'Telegram сповіщення про замовлення', done: false }
+            { text: 'Реализация системы оформления заказов', done: false },
+            { text: 'Интеграция с Telegram или формой заявок', done: false },
+            { text: 'Базовая админ-панель (управление товарами)', done: false },
+            { text: 'Корректная структура заголовков и Meta-теги (SEO)', done: false },
+            { text: 'Оптимизация скорости и индексация (PageSpeed)', done: false },
+            { text: 'Блоки доверия, отзывы, продающие триггеры', done: false },
+            { text: 'Финальное тестирование и исправление багов', done: false },
+            { text: 'Передача исходного кода и доступов', done: false },
+            { text: 'Инструкция по работе с сайтом', done: false }
         ]
     };
 
     async function sync(data = null) {
-        document.querySelectorAll('.sync-status').forEach(el => el.innerText = 'Syncing...');
+        document.querySelectorAll('.sync-status').forEach(el => el.innerText = 'Сохранение...');
         try {
             if (data) {
                 await fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
@@ -188,25 +196,14 @@
                 const cloudData = await res.json();
                 if (cloudData && Object.keys(cloudData).length > 0) state = cloudData;
             }
-            document.querySelectorAll('.sync-status').forEach(el => el.innerText = 'Saved ✓');
+            document.querySelectorAll('.sync-status').forEach(el => el.innerText = 'Сохранено ✓');
         } catch (e) {
-            document.querySelectorAll('.sync-status').forEach(el => el.innerText = 'Local');
+            document.querySelectorAll('.sync-status').forEach(el => el.innerText = 'Локально');
         }
         render();
     }
 
-    async function getRate() {
-        try {
-            const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-            const d = await res.json();
-            usdRate = d.rates.UAH;
-            document.getElementById('rateVal').innerText = `1$ = ${usdRate.toFixed(2)} грн`;
-            render();
-        } catch(e) {}
-    }
-
     function render() {
-        // Tasks
         const draw = (list, id, type) => {
             const cont = document.getElementById(id); cont.innerHTML = '';
             let d = 0;
@@ -227,22 +224,19 @@
         document.getElementById('overallPerc').innerText = p + '%';
         document.getElementById('progBar').style.width = p + '%';
 
-        // Finance
-        let bal = 0; const h = document.getElementById('histContent'); h.innerHTML = '';
+        let inc = 0, exp = 0; 
+        const h = document.getElementById('histContent'); h.innerHTML = '';
         state.transactions.forEach((t, i) => {
-            bal += (t.type==='income'?t.uah:-t.uah);
+            if(t.type === 'income') inc += t.uah; else exp += t.uah;
             h.innerHTML += `
-            <div class="list-item">
+            <div class="list-item" style="align-items: center;">
                 <div class="list-text"><b>${t.note}</b><br><small style="color:var(--muted)">${t.date}</small></div>
-                <b style="color:var(--${t.type==='income'?'success':'danger'})">${t.type==='income'?'+':'-'}${t.uah}</b>
+                <b style="color: ${t.type==='income' ? '#fff' : 'var(--muted)'}; font-size: 14px;">${t.type==='income'?'+':'-'}${t.uah} ₴</b>
                 <div class="del-icon" onclick="delM(${i})">✕</div>
             </div>`;
         });
-        const usdBal = bal / usdRate;
-        document.getElementById('currentBalance').innerText = `$${usdBal.toFixed(2)}`;
-        const mP = Math.round((usdBal/state.goal)*100);
-        document.getElementById('moneyBar').style.width = Math.min(100, Math.max(0, mP)) + '%';
-        document.getElementById('moneyPerc').innerText = `${mP}% від $1500`;
+        document.getElementById('totalIncome').innerText = `${inc} ₴`;
+        document.getElementById('totalExpense').innerText = `${exp} ₴`;
     }
 
     window.switchTab = (t, b) => {
@@ -259,17 +253,16 @@
     };
 
     window.toggleT = (type, i) => { state[type+'Tasks'][i].done = !state[type+'Tasks'][i].done; sync(state); };
-    window.delT = (type, i) => { if(confirm('Видалити?')){state[type+'Tasks'].splice(i,1); sync(state);} };
+    window.delT = (type, i) => { if(confirm('Удалить задачу?')){state[type+'Tasks'].splice(i,1); sync(state);} };
 
     window.addMoney = (type) => {
         const v = document.getElementById('moneyVal'); const n = document.getElementById('moneyNote');
         if(!v.value) return;
-        state.transactions.unshift({type, uah: parseFloat(v.value), note: n.value||'Платіж', date: new Date().toLocaleDateString()});
+        state.transactions.unshift({type, uah: parseFloat(v.value), note: n.value||(type==='income'?'Оплата':'Расход'), date: new Date().toLocaleDateString()});
         v.value = ''; n.value = ''; sync(state);
     };
-    window.delM = (i) => { if(confirm('Видалити транзакцію?')){state.transactions.splice(i,1); sync(state);} };
+    window.delM = (i) => { if(confirm('Удалить запись?')){state.transactions.splice(i,1); sync(state);} };
 
-    getRate();
     sync();
 </script>
 </body>
